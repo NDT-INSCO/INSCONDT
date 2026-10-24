@@ -57,7 +57,14 @@ jobs:
       - name: Check the published folder
         run: npm run site:check
 
+      # `enablement: true` lets the workflow create the Pages site on its own when
+      # it is still disabled (Settings → Pages → Source). It only works if the
+      # token is allowed to administer Pages; otherwise the run stops here and
+      # prints exactly that, and the site has to be enabled once by hand — see
+      # documentation/DEPLOY_GITHUB_PAGES_AR.md.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
