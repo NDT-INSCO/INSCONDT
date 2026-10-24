@@ -392,7 +392,9 @@ export const V1V2CalibrationLab: React.FC<V1V2CalibrationLabProps> = ({
 
     const record = recordSimulationAttempt({
       simulatorId: 'v1_v2_code_calibration_lab',
-      targetSubTab: 'v1_v2_calibration',
+      // Calibration work lives in the DAC/calibration workshop tab, so a history
+      // entry has to point back there: `AcademyTab` only accepts known tabs.
+      targetSubTab: 'dac_builder',
       simulatorTitle: {
         ar: 'معمل كالبريشن بلوكات V1 & V2 واستارت تشيك اللحام وفق الأكواد',
         en: 'V1 & V2 Calibration Blocks & Weld Start-Check Simulator',
