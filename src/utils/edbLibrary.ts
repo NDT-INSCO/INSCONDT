@@ -4,6 +4,7 @@ import { courseToEdb, textbookToEdb } from '../edb/convert';
 import { formatFormula } from '../edb/format';
 import { parseEdb, stableStringify } from '../edb/validate';
 import { EdbDocument, EdbIndex, EdbIndexEntry } from '../edb/types';
+import { assetBase, assetUrl } from './assetUrl';
 
 export const EDB_PROGRESS_KEY = 'insco_edb_reading_v1';
 
@@ -74,15 +75,9 @@ export function localEdbDocument(id: string): EdbDocument | null {
   return null;
 }
 
-function assetBase(): string {
-  const base = (import.meta as ImportMeta & { env?: { BASE_URL?: string } }).env?.BASE_URL || '/';
-  return base.endsWith('/') ? base : `${base}/`;
-}
-
-/** Absolute-url path for a file shipped in `public/` (honours the Vite base). */
-export function assetUrl(relative: string): string {
-  return `${assetBase()}${relative.replace(/^\//, '')}`;
-}
+// `assetBase`/`assetUrl` live in their own module so the company sections can
+// use them without pulling the whole EDB library into the first payload.
+export { assetBase, assetUrl };
 
 function assetCandidates(relative: string): string[] {
   const normalizedBase = assetBase();

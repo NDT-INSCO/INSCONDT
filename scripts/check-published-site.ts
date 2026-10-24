@@ -8,7 +8,7 @@
  * `public/` and still ship broken if the published folder is stale, incomplete,
  * or references the wrong base. These checks run offline.
  */
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { validateEpub } from '../src/epub/validate';
 
@@ -127,7 +127,51 @@ if (!existsSync(epubIndexPath)) {
   note(`EPUB: ${books.length} books, ${(books.reduce((sum, book) => sum + book.bytes, 0) / 1024).toFixed(0)} KiB`);
 }
 
-// 5) Size budget for the first payload
+// 5) Everything the company sections load from `public/` must ship, and no
+// source file may reference the Vite dev path (`/src/...`), which only exists
+// while `npm run dev` is running. That mistake shipped a site whose hero and
+// service images were blank.
+function walk(dir: string, out: string[] = []): string[] {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) walk(full, out);
+    else out.push(full);
+  }
+  return out;
+}
+
+const publicDir = path.resolve(process.cwd(), 'public');
+const publicFiles = existsSync(publicDir) ? walk(publicDir) : [];
+const shipped = publicFiles.filter(file => !file.endsWith('.nojekyll'));
+let publicBytes = 0;
+for (const file of shipped) {
+  const relative = path.relative(publicDir, file);
+  const target = path.join(docs, relative);
+  if (!existsSync(target)) {
+    fail(`public/${relative} is not in docs/ — the published site would 404 on it`);
+    continue;
+  }
+  if (statSync(target).size !== statSync(file).size) {
+    fail(`docs/${relative} does not match public/${relative}`);
+    continue;
+  }
+  publicBytes += statSync(file).size;
+}
+note(`public files copied: ${shipped.length} (${(publicBytes / 1024).toFixed(0)} KiB)`);
+
+const srcDir = path.resolve(process.cwd(), 'src');
+const devPath = /['"`]\/src\/(?:assets|components|data|utils)\//;
+for (const file of [...walk(srcDir).filter(item => /\.(ts|tsx)$/.test(item)), path.resolve(process.cwd(), 'index.html')]) {
+  if (!existsSync(file)) continue;
+  if (devPath.test(readFileSync(file, 'utf8'))) {
+    fail(
+      `${path.relative(process.cwd(), file)} references a "/src/..." path, which only exists in the dev ` +
+        'server. Use assetUrl() with a file in public/ instead'
+    );
+  }
+}
+
+// 6) Size budget for the first payload
 const assetsDir = path.join(docs, 'assets');
 if (existsSync(assetsDir)) {
   const html = readFileSync(indexPath, 'utf8');
