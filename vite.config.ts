@@ -5,14 +5,16 @@ import tailwindcss from '@tailwindcss/vite';
 /**
  * The path the site is served from.
  *
- * A GitHub Pages *project* site lives under `/<repo-name>/`, so the base is
- * whatever the deploy workflow says it is (`SITE_BASE`). The default keeps the
- * historical address `https://ndt-insco.github.io/-Project-/` working for local
- * builds, which is why nothing breaks if the variable is unset.
+ * A GitHub Pages *project* site lives under `/<repo-name>/`, so the base has to
+ * match the hosting repository. This repository publishes at
+ * `https://ndt-insco.github.io/INSCONDT/`, which is the default — so `npm run
+ * build` alone produces a folder that works on Pages, whichever way Pages is
+ * configured. `SITE_BASE` overrides it (custom domain → `/`, the older
+ * `-Project-` repository → `/-Project-/`).
  */
 function siteBase(): string {
   const raw = (process.env.SITE_BASE ?? '').trim();
-  if (!raw) return '/-Project-/';
+  if (!raw) return '/INSCONDT/';
   const trimmed = raw.replace(/^\/+|\/+$/g, '');
   return trimmed ? `/${trimmed}/` : '/';
 }
