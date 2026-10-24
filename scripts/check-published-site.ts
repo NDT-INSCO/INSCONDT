@@ -4,7 +4,7 @@
  *   npm run site:check
  *
  * GitHub Pages serves the repository `docs/` folder from
- * https://ndt-insco.github.io/-Project-/ . A build can be perfectly valid in
+ * https://ndt-insco.github.io/INSCONDT/ . A build can be perfectly valid in
  * `public/` and still ship broken if the published folder is stale, incomplete,
  * or references the wrong base. These checks run offline.
  */
@@ -19,7 +19,7 @@ import { validateEpub } from '../src/epub/validate';
  */
 function siteBase(): string {
   const raw = (process.env.SITE_BASE ?? '').trim();
-  if (!raw) return '/-Project-/';
+  if (!raw) return '/INSCONDT/';
   const trimmed = raw.replace(/^\/+|\/+$/g, '');
   return trimmed ? `/${trimmed}/` : '/';
 }
