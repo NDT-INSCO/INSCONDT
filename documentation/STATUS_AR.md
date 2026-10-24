@@ -17,8 +17,10 @@ npm run epub:build # بناء نسخة EPUB (Kindle/Kobo/Apple Books)
 `npm run verify` هو بوابة الدمج. لا تعتمد على `npm run build` وحده:
 البناء الناجح لا يعني أن `docs/` المنشور سليم — لذلك `site:check` في نهاية السلسلة.
 
-نشر الموقع: GitHub Pages ينشر `main`/`docs`. العمل على فرع لا يظهر على
-`https://ndt-insco.github.io/-Project-/` حتى يُدمج. راجع `SITE_REVIEW_AR.md`.
+نشر الموقع: كل دفع إلى `main` يبني الموقع من المصدر وينشره على
+`https://ndt-insco.github.io/INSCONDT/` عبر `.github/workflows/deploy.yml`.
+العمل على فرع لا يظهر على الرابط حتى يُدمج. الخطوات الكاملة في
+`DEPLOY_GITHUB_PAGES_AR.md`.
 
 ---
 

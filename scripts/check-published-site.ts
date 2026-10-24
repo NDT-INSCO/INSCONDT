@@ -12,7 +12,19 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { validateEpub } from '../src/epub/validate';
 
-const BASE = '/-Project-/';
+/**
+ * Same base the build used (`SITE_BASE`), so this check validates the folder
+ * that is actually about to be published, whether that is
+ * `https://ndt-insco.github.io/-Project-/` or a new repository's own path.
+ */
+function siteBase(): string {
+  const raw = (process.env.SITE_BASE ?? '').trim();
+  if (!raw) return '/-Project-/';
+  const trimmed = raw.replace(/^\/+|\/+$/g, '');
+  return trimmed ? `/${trimmed}/` : '/';
+}
+
+const BASE = siteBase();
 const docs = path.resolve(process.cwd(), 'docs');
 const problems: string[] = [];
 const notices: string[] = [];
